@@ -4,6 +4,8 @@ import com.azami.patient_service.DTO.PatientRequestDTO;
 import com.azami.patient_service.DTO.PatientResponseDTO;
 import com.azami.patient_service.DTO.Validators.CreatePatientValidationGroup;
 import com.azami.patient_service.Service.PatientService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +24,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/patients")
 @Slf4j
+@Tag(name = "Patient", description = "API for managing patients")
 public class PatientController {
 
     private final PatientService patientService;
 
     @GetMapping
+    @Operation(summary = "Get Patients")
     public ResponseEntity<List<PatientResponseDTO>> getPatients() {
         List<PatientResponseDTO> patientResponseDTOS = patientService.getPatient();
 
@@ -34,7 +38,7 @@ public class PatientController {
     }
 
     @PostMapping
-    //@ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create a Patient")
     public ResponseEntity<PatientResponseDTO> createPatient(
             @Validated({Default.class, CreatePatientValidationGroup.class}) @RequestBody PatientRequestDTO patientRequestDTO
     ) {
@@ -42,6 +46,7 @@ public class PatientController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update a Patient")
     public ResponseEntity<PatientResponseDTO> updatePatient(
             @PathVariable UUID id,
             @Validated({Default.class}) @RequestBody PatientRequestDTO patientRequestDTO
@@ -55,6 +60,7 @@ public class PatientController {
     }
 
     @DeleteMapping("{id}")
+    @Operation(summary = "Delete a Patient")
     public ResponseEntity<Void> deletePatient(@PathVariable UUID id) {
         patientService.deletePatient(id);
 
