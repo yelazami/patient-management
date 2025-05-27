@@ -1,1 +1,2 @@
 ### GET Request
+GRPC localhost:9001/BillingService

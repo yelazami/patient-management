@@ -17,6 +17,7 @@
     <description>Patient management demo project</description>
     <modules>
         <module>patient-service</module>
+        <module>billing-service</module>
     </modules>
 
     <properties>
