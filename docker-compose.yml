@@ -32,6 +32,19 @@ services:
     networks:
       - internal
 
+  billing-service:
+    build:
+      context: .
+      dockerfile: ./billing-service/Dockerfile
+    container_name: billing-service
+    volumes:
+      - ./billing-service/target:/app/billing-service/target:rw
+    ports:
+      - "4001:4001"
+      - "9001:9001"
+    networks:
+      - internal
+
 
 volumes:
   postgres_data:
