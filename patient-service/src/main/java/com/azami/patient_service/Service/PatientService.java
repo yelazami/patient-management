@@ -7,6 +7,8 @@ import com.azami.patient_service.Exception.PatientNotFoundException;
 import com.azami.patient_service.Mapper.PatientMapper;
 import com.azami.patient_service.Model.Patient;
 import com.azami.patient_service.Repository.PatientRepository;
+import com.azami.patient_service.grpc.BillingServiceGrpcClient;
+import com.azami.patient_service.kafka.KafkaProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,10 @@ public class PatientService {
 
     private final PatientRepository patientRepository;
 
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
+
+    private final KafkaProducer kafkaProducer;
+
     public List<PatientResponseDTO> getPatient() {
         List<Patient> patients = patientRepository.findAll();
 
@@ -36,13 +42,21 @@ public class PatientService {
             throw new EmailAlreadyExistsException("A patient with this email "+ patientRequestDTO.getEmail() +" already exists");
         }
 
-        return PatientMapper.toDTO(
-                patientRepository
-                        .save(
-                                PatientMapper
-                                        .toModel(patientRequestDTO)
-                        )
+        Patient newPatient = patientRepository
+                .save(
+                        PatientMapper
+                                .toModel(patientRequestDTO)
+                );
+
+        billingServiceGrpcClient.createBillingAccount(
+                newPatient.getId().toString(),
+                newPatient.getName(),
+                newPatient.getEmail()
         );
+
+        kafkaProducer.sendEvent(newPatient);
+
+        return PatientMapper.toDTO(newPatient);
     }
 
     public PatientResponseDTO updatePatient(UUID id, PatientRequestDTO patientRequestDTO) {

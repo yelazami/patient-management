@@ -1,0 +1,39 @@
+// Spécifie la syntaxe utilisée par le fichier Protobuf (ici la version 3, la plus récente et recommandée)
+syntax = "proto3";
+
+// Génère plusieurs fichiers Java au lieu d’un seul, ce qui facilite l'organisation des classes
+option java_multiple_files = true;
+
+// Définit le package Java dans lequel les fichiers générés seront placés (comme un namespace)
+option java_package = "billing";
+
+// Déclaration d’un service gRPC nommé `BillingService`
+// Ce service contiendra toutes les méthodes RPC que les clients peuvent appeler
+service BillingService {
+  // Déclare une méthode RPC nommée CreateBillingAccount
+  // Elle prend un message `BillingRequest` en entrée
+  // Elle renvoie un message `BillingResponse` en sortie
+  rpc CreateBillingAccount (BillingRequest) returns (BillingResponse);
+}
+
+// Définition du message utilisé pour la requête gRPC `CreateBillingAccount`
+// Ce message est envoyé par le client au serveur
+message BillingRequest {
+  // Les numéros sont utilisés dans le binaire pour la sérialisation/desérialisation
+  // Ils doivent être uniques dans un même message
+  string patientId = 1;
+
+  string name = 2;
+
+  string email = 3;
+}
+
+// Définition du message utilisé pour la réponse gRPC `CreateBillingAccount`
+// Ce message est envoyé par le serveur au client
+message BillingResponse {
+  // Champ `accountId` : identifiant généré pour le compte de facturation
+  string accountId = 1;
+
+  // Champ `status` : statut de la création du compte (ex. : "SUCCESS", "ERROR")
+  string status = 2;
+}
