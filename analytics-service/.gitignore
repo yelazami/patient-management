@@ -1,7 +1,6 @@
-.idea/*
-patient-service/HELP.md
+HELP.md
 target/
-!patient-service/.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
@@ -15,7 +14,7 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-../.idea
+.idea
 *.iws
 *.iml
 *.ipr
@@ -32,6 +31,4 @@ build/
 
 ### VS Code ###
 .vscode/
-
-postgres_data
 .DS_Store
