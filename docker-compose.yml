@@ -16,6 +16,22 @@ services:
     networks:
       - internal
 
+
+  auth-service-db:
+    image: postgres:latest
+    container_name: auth-service-db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db
+    ports:
+      - "5001:5432"
+    volumes:
+      - ./auth-service-data:/var/lib/postgresql/data
+    networks:
+      - internal
+
   #zookeeper:
     #image: confluentinc/cp-zookeeper:7.5.0
     #container_name: zookeeper
@@ -79,10 +95,9 @@ services:
       BILLING_SERVICE_ADDRESS: billing-service
       BILLING_SERVICE_GRPC_PORT: 9001
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    ports:
-      - "4000:4000"
     depends_on:
       - kafka
+      - postgres
     networks:
       - internal
 
@@ -115,6 +130,40 @@ services:
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
+      - kafka
+    networks:
+      - internal
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./api-gateway/Dockerfile
+    container_name: api-gateway
+    volumes:
+      - ./api-gateway/target:/app/api-gateway/target:rw
+    ports:
+      - "4004:4004"
+    depends_on:
+      - kafka
+    networks:
+      - internal
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: ./auth-service/Dockerfile
+    container_name: auth-service
+    volumes:
+      - ./auth-service/target:/app/auth-service/target:rw
+    environment:
+      JWT_SECRET: dkeX4Qnao6JvcDnoumCCEVjJloGlrLpGGyeS6G+xU8Q=
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-service-db:5432/db
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_SQL_INIT_MODE: always
+    depends_on:
+      - auth-service-db
       - kafka
     networks:
       - internal
